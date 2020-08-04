@@ -41,7 +41,7 @@ function S3Uploader() {
 
   return (
     <>
-        <h1>Upload Files!</h1>
+        <h1>Upload to S3</h1>
         <Dropzone
           getUploadParams={getUploadParams}
           onSubmit={handleSubmit}
