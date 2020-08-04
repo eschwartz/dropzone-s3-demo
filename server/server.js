@@ -6,6 +6,9 @@ const fs = require('fs');
 const multer = require('multer')
 const path = require('path');
 
+app.use(express.static('public/uploads'));
+
+
 // Configure multer middlewear
 const upload = multer({ 
   storage: multer.diskStorage({
@@ -28,16 +31,23 @@ const s3 = new aws.S3();
 
 // Keep images in an array
 // (could be a DB, IRL)
-const images = [];
+const imagesDB = [];
 
 // Arg to `upload.single()` must match name attr in <input>
-app.post('/upload', upload.single('fileToUpload'), (req, res) => {
-  // Save image path to array
-  images.push(file.path);
+app.post('/upload', upload.any(), (req, res) => {
+  console.log('req.files', req.files);
 
-  console.log('req.file', req.file);
-  res.redirect('/');
+  // Save image paths to the "DB"
+  req.files.forEach(f => {
+    imagesDB.push(f.filename)
+  });
+
+  res.sendStatus(201);
 });
+
+app.get('/images', (req, res) => {
+  res.send(imagesDB);
+})
 
 app.post('/upload-url', async (req, res) => {
   // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#createPresignedPost-property
