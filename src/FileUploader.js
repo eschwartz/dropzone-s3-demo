@@ -32,6 +32,9 @@ function FileUploader() {
           getUploadParams={getUploadParams}
           onSubmit={handleSubmit}
         />
+
+
+        
         <h2>Gallery</h2>
         {images.map(image => (
           <img src={image} height="100px"/>

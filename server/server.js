@@ -9,16 +9,18 @@ const path = require('path');
 app.use(express.static('public/uploads'));
 
 
-// Configure multer middlewear
+// Configure multer middleware
 const upload = multer({ 
   storage: multer.diskStorage({
 
     // Upload files to public/uploads
     destination: (req, file, cb) => {
-      cb(null, 'public/uploads/');
+      let uploadDirectory = 'public/uploads/'
+      cb(null, uploadDirectory);
     },
 
-    // Give the file a unique name
+    // Give each uploaded file a unique name,
+    // so we don't accidentally overwrite existing files
     filename: (req, file, cb) => {
       const filename = `${Date.now()}-${file.originalname}`;
       cb(null, filename);
@@ -45,6 +47,23 @@ app.post('/upload', upload.any(), (req, res) => {
   res.sendStatus(201);
 });
 
+app.post('/upload-to-s3', upload.any(), async (req, res) => {
+  for (let file of req.files) {
+    // Initialize a "Read stream" to start
+    // reading data from this file
+    console.log(`uploading ${file.filename}...`)
+    await s3.upload({
+      Bucket: 'prime-academy-file-upload-demo-2020',
+      Key: file.filename,
+      // Initialize a "read stream" to read data from
+      // the file, and "pipe" it up to S3
+      Body: fs.createReadStream(file.path)
+    }).promise()
+    console.log(`uploading ${file.filename}... done.`)
+  }
+  res.sendStatus(200);
+})
+
 app.get('/images', (req, res) => {
   res.send(imagesDB);
 })
@@ -55,7 +74,7 @@ app.post('/upload-url', async (req, res) => {
   console.log('yo');
 
   s3.createPresignedPost( {
-    Bucket: 'nagle-demo-for-sam',
+    Bucket: 'prime-academy-file-upload-demo-2020',
     Expires: expires,
     Fields: {
       key: 'test-file.txt',
