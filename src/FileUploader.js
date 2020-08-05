@@ -7,7 +7,12 @@ function FileUploader() {
   const [images, setImages] = useState([]);
 
   const getUploadParams = () => ({
-    url: '/upload'
+    url: '/upload',
+    // Pass other data to API
+    // (available in req.body, on server)
+    fields: {
+      food: "tacos"
+    }
   });
 
   const handleSubmit = (files, allFiles) => {

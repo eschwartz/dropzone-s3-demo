@@ -4,9 +4,10 @@ const app = express();
 const aws = require('aws-sdk');
 const fs = require('fs');
 const multer = require('multer')
-const path = require('path');
+const bodyParser = require('body-parser');
 
 app.use(express.static('public/uploads'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 // Configure multer middleware
@@ -38,6 +39,9 @@ const imagesDB = [];
 // Arg to `upload.single()` must match name attr in <input>
 app.post('/upload', upload.any(), (req, res) => {
   console.log('req.files', req.files);
+
+  // We can receive other data from the client, too
+  console.log('req.body.food', req.body.food);
 
   // Save image paths to the "DB"
   req.files.forEach(f => {
