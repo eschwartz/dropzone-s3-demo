@@ -1,68 +1,43 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
+# File Upload Example
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+This repo demonstrates file uploads, including both server-side and client-side code.
 
-### `npm start`
+We use [multer](https://github.com/expressjs/multer) on the server. This handles `multipart/form-data` uploads from the client, saves the files to a local directory. It then adds a `req.files` property to our express request object, with information about the uploaded files.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+On the client, we use [`react-dropzone-uploader`](https://react-dropzone-uploader.js.org/docs/quick-start), which allows drag-and-drop file uploads. Note that could just as easily use a standard HTML form to uploads the file:
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+```html
+<form action="/upload" method="post" enctype="multipart/form-data">
+  <input type="file" name="myFileUpload" />
+</form>
+```
 
-### `npm test`
+...or any number of other open source libraries to help with form uploads. 
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+We also handle uploads to AWS S3.
 
-### `npm run build`
+## Getting Started
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Just your standard full-stack React app.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+```
+npm install
+npm run server
+npm run client
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Using a database
 
-### `npm run eject`
+In your proejct applications, you will need to keep track of each image's file path. You will likely also want to track other  "meta-data" about the image -- what's it for, who uplaoded it, etc. 
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+In this example, I use a JS array on the server to store the image info on the server. IRL, you will want to store this information in a database table. This will allow you to lookup all images belong to a user (for example), and return each image's file path to the client.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Relevant Code
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+- [FileUploader.js](./src/FileUploader.js): Client side form component to upload to the server's local file system
+- [S3Uploader.js](./src/S3Uploader.js): Client side form component to upload to S3
+- [local.router.js](./server/routers/local.router.js): Server-side router to handle local file uploads.
+- [s3.router.js](./server/routers/s3.router.js): Server-side router to handle file upload to AWS S3.
+- [upload.js](./server/routers/upload.js): Configuration of the `multer` middleware, to handle file uploads
